@@ -131,3 +131,24 @@ footer {
   padding: 1.5rem 0;
   text-align: center;
 }
+/* ─ Remove underline & default blue on the CV link ─ */
+.no-underline {
+  text-decoration: none;
+  color: inherit; /* use the same text color as surrounding text */
+  transition: color 0.2s ease-in-out;
+}
+.no-underline:hover {
+  color: var(--accent); /* change to your accent color on hover */
+  text-decoration: none;
+}
+
+/* ─ Enlarge/animate the paper‐document emoji on hover ─ */
+.cv-emoji {
+  display: inline-block; /* so we can transform it */
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer; /* show pointer when hovering */
+}
+.cv-emoji:hover {
+  transform: scale(2); /* enlarge to 200% */
+  text-shadow: 0 0 8px rgba(0, 123, 255, 0.8), 0 0 16px rgba(0, 123, 255, 0.6);
+}
