@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Nikita Andreev — Portfolio</title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <section
+      class="hero d-flex flex-column align-items-center justify-content-center"
+    >
+      <img src="css/profile.jpg" alt="Profile" class="hero-img mb-4" />
+      <h1 class="display-5 fw-bold">Hello, I’m Nikita Andreev</h1>
+      <p class="lead mb-4">Data Analyst &amp; Python Developer</p>
+      <p>
+        Explore a set of interactive mini-apps I’ve crafted with HTML, CSS &amp;
+        JavaScript.
+      </p>
+    </section>
+
+    <!-- Mini-Apps Grid -->
+    <section class="container py-5">
+      <div class="apps-grid">
+        <!-- Random Number Generator -->
+        <div class="card card-app">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">🔢 Random Number Generator</h5>
+            <p class="card-text">Generate a random number.</p>
+            <a
+              href="apps/random-number/index.html"
+              class="btn btn-light mt-auto"
+              >Try</a
+            >
+          </div>
+        </div>
+
+        <!-- Wheel of Fortune -->
+        <div class="card card-app">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">🎡 Wheel of Fortune</h5>
+            <p class="card-text">Spin a wheel to determine a winner.</p>
+            <a
+              href="apps/wheel-spinner/index.html"
+              class="btn btn-light mt-auto"
+              >Try</a
+            >
+          </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="card card-app">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">⏱️ Timer</h5>
+            <p class="card-text">Start a countdown.</p>
+            <a href="apps/timer/index.html" class="btn btn-light mt-auto"
+              >Try</a
+            >
+          </div>
+        </div>
+
+        <!-- More Coming Soon -->
+        <div class="card card-app coming-soon">
+          <div class="card-body d-flex flex-column text-center">
+            <h5 class="card-title">🔧 More Coming Soon</h5>
+            <p class="card-text">Stay tuned!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>&copy; <span id="year"></span> Nikita Andreev</footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

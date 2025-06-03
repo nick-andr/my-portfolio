@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>🎡 Wheel of Fortune</title>
+
+    <!-- Google Font & Bootstrap -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="../../css/style.css" />
+
+    <style>
+      /* Wheel container & pointer */
+      .wheel-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+      }
+      #wheel {
+        width: 100%;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        transition: transform 5s ease-out;
+        transform: rotate(0rad);
+      }
+      /* Pointer at top, pointing down */
+      #wheel-pointer {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 20px solid #ff7675; /* coral contrast */
+        transform: translateX(-50%);
+        z-index: 2;
+      }
+      /* List of options styling */
+      #optionsList {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-light text-dark">
+    <section class="container py-5">
+      <h2 class="mb-4 text-center">🎡 Wheel of Fortune</h2>
+
+      <!-- Input form -->
+      <div class="row g-2 mb-4 justify-content-center">
+        <div class="col-sm-6 col-md-5">
+          <input
+            type="text"
+            id="optionName"
+            class="form-control"
+            placeholder="Section name"
+          />
+        </div>
+        <div class="col-sm-4 col-md-3">
+          <input
+            type="number"
+            id="optionPremium"
+            class="form-control"
+            placeholder="Extra weight % (opt.)"
+            min="0"
+          />
+        </div>
+        <div class="col-sm-2 col-md-2">
+          <button id="addOption" class="btn btn-primary w-100">Add</button>
+        </div>
+      </div>
+
+      <!-- Options list + Wheel -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <h5>Sections</h5>
+          <ul id="optionsList" class="list-group"></ul>
+        </div>
+        <div class="col-md-8 d-flex justify-content-center">
+          <div class="wheel-container">
+            <canvas id="wheel" width="400" height="400"></canvas>
+            <div id="wheel-pointer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spin button -->
+      <div class="text-center mb-3">
+        <button id="spin" class="btn btn-success px-5" disabled>Spin</button>
+      </div>
+
+      <!-- Result -->
+      <div id="result" class="alert d-none text-center"></div>
+    </section>
+
+    <footer class="text-center py-4">
+      &copy; <span id="year"></span> Nikita Andreev
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+    <script>
+      const canvas = document.getElementById("wheel");
+      const ctx = canvas.getContext("2d");
+      const spinBtn = document.getElementById("spin");
+      const resultEl = document.getElementById("result");
+      const listEl = document.getElementById("optionsList");
+
+      // Fixed pool of 20 contrast colours
+      const COLORS = [
+        "#e6194b",
+        "#3cb44b",
+        "#ffe119",
+        "#0082c8",
+        "#f58231",
+        "#911eb4",
+        "#46f0f0",
+        "#f032e6",
+        "#d2f53c",
+        "#fabebe",
+        "#008080",
+        "#e6beff",
+        "#aa6e28",
+        "#fffac8",
+        "#800000",
+        "#aaffc3",
+        "#808000",
+        "#ffd8b1",
+        "#000080",
+        "#808080",
+      ];
+      const colorMap = {}; // name -> colour
+      let nextColor = 0;
+
+      let options = [];
+
+      // Render the side list
+      function renderList() {
+        listEl.innerHTML = "";
+        options.forEach((opt, i) => {
+          const li = document.createElement("li");
+          li.className =
+            "list-group-item d-flex justify-content-between align-items-center";
+          li.textContent =
+            `${opt.name}` + (opt.premium > 0 ? ` (+${opt.premium}%)` : "");
+          const rm = document.createElement("button");
+          rm.className = "btn-close";
+          rm.onclick = () => {
+            options.splice(i, 1);
+            renderList();
+            drawWheel();
+            spinBtn.disabled = options.length < 2;
+          };
+          li.appendChild(rm);
+          listEl.appendChild(li);
+        });
+      }
+
+      // Draw the wheel slices
+      function drawWheel() {
+        const total = options.reduce((sum, o) => sum + o.weight, 0);
+        let startAng = 0;
+        ctx.clearRect(0, 0, 400, 400);
+        options.forEach((opt) => {
+          const sliceAng = (opt.weight / total) * 2 * Math.PI;
+          ctx.beginPath();
+          ctx.moveTo(200, 200);
+          ctx.arc(200, 200, 200, startAng, startAng + sliceAng);
+          ctx.fillStyle = opt.color;
+          ctx.fill();
+          ctx.stroke();
+          // Label
+          ctx.save();
+          ctx.translate(200, 200);
+          ctx.rotate(startAng + sliceAng / 2);
+          ctx.textAlign = "right";
+          ctx.fillStyle = "#2d3436";
+          ctx.font = "bold 14px Poppins";
+          ctx.fillText(opt.name, 180, 0);
+          ctx.restore();
+          startAng += sliceAng;
+        });
+      }
+
+      // Add new section
+      document.getElementById("addOption").addEventListener("click", () => {
+        const name = document.getElementById("optionName").value.trim();
+        let premium = parseFloat(
+          document.getElementById("optionPremium").value
+        );
+        if (!name) return alert("Enter a section name.");
+        if (isNaN(premium) || premium < 0) premium = 0;
+        const weight = 1 + premium / 100;
+        // assign colour
+        if (!colorMap[name]) {
+          colorMap[name] = COLORS[nextColor % COLORS.length];
+          nextColor++;
+        }
+        options.push({ name, premium, weight, color: colorMap[name] });
+        document.getElementById("optionName").value = "";
+        document.getElementById("optionPremium").value = "";
+        renderList();
+        drawWheel();
+        spinBtn.disabled = options.length < 2;
+        resultEl.classList.add("d-none");
+      });
+
+      // Spin (eliminate one)
+      spinBtn.addEventListener("click", () => {
+        if (options.length < 2) return;
+        const total = options.reduce((s, o) => s + o.weight, 0);
+        let r = Math.random() * total,
+          idx = 0;
+        for (let i = 0; i < options.length; i++) {
+          r -= options[i].weight;
+          if (r <= 0) {
+            idx = i;
+            break;
+          }
+        }
+        // calculate rotation
+        let accum = 0;
+        for (let i = 0; i < idx; i++) accum += options[i].weight;
+        const startAng = (accum / total) * 2 * Math.PI;
+        const sliceAng = (options[idx].weight / total) * 2 * Math.PI;
+        const midAng = startAng + sliceAng / 2;
+        const pointerAng = -Math.PI / 2;
+        const extraSpins = 3 * 2 * Math.PI;
+        const rotateTo = extraSpins + (pointerAng - midAng);
+
+        canvas.style.transition = "transform 5s ease-out";
+        canvas.style.transform = `rotate(${rotateTo}rad)`;
+        spinBtn.disabled = true;
+
+        canvas.addEventListener("transitionend", function handler() {
+          canvas.removeEventListener("transitionend", handler);
+          const eliminated = options.splice(idx, 1)[0];
+          canvas.style.transition = "none";
+          canvas.style.transform = "rotate(0rad)";
+          drawWheel();
+          renderList();
+
+          if (options.length > 1) {
+            resultEl.textContent = `Eliminated: ${eliminated.name}`;
+            resultEl.className = "alert alert-info text-center";
+            spinBtn.disabled = false;
+          } else {
+            resultEl.textContent = `🎉 Winner: ${options[0].name}`;
+            resultEl.className = "alert alert-success text-center";
+          }
+          resultEl.classList.remove("d-none");
+        });
+      });
+    </script>
+  </body>
+</html>
